@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.cu": "cuda",
+        "*.cuh": "cuda",
+        "*.cpp": "cpp",
+        "atomic": "cpp"
+    }
+}

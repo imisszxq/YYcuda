@@ -21,6 +21,16 @@ __device__ __forceinline__ float WarpReduceSum(float sum)
     return sum;
 }
 
+#pragma unroll
+__device__ float WarpReduceSumV2(float sum, unsigned int SumSize)
+{
+    for (unsigned int i = SumSize; i >= 1; i /= 2)
+    {
+        sum += __shfl_down_sync(0xffffffff, sum, i);
+    }
+    return sum;
+}
+
 __global__ void reduce_v3(float *d_out,
                           const float *d_in,
                           unsigned int n)
@@ -36,25 +46,25 @@ __global__ void reduce_v3(float *d_out,
         i += grid_size;
     }
     sum = WarpReduceSum<BLOCK_SIZE>(sum);
-    
+
     // 将每个warp的结果写入shared_memory
     __shared__ float d_shared[WARP_SIZE];
     const int laneId = tid % WARP_SIZE;
     const int warpId = tid / WARP_SIZE;
-    if(laneId==0){
-        d_shared[warpId]=sum;
+    if (laneId == 0)
+    {
+        d_shared[warpId] = sum;
     }
     __syncthreads();
-    sum=(tid<BLOCK_SIZE/WARP_SIZE)?d_shared[laneId]:0.0f;
-    if(warpId==0){
-        sum=WarpReduceSum<WARP_SIZE>(sum);
+    sum = (tid < BLOCK_SIZE / WARP_SIZE) ? d_shared[laneId] : 0.0f;
+    if (warpId == 0)
+    {
+        sum = WarpReduceSum<WARP_SIZE>(sum);
     }
-    if(tid==0){
-        d_out[blockIdx.x]=sum;
+    if (tid == 0)
+    {
+        d_out[blockIdx.x] = sum;
     }
-
-
-
 }
 
 int main()

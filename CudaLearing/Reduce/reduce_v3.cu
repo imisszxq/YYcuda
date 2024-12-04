@@ -20,6 +20,13 @@ __device__ __forceinline__ float WarpReduceSum(float sum)
         sum += __shfl_down_sync(0xffffffff, sum, 1);
     return sum;
 }
+/*
+#pagram unroll
+for(int i=16;i>0;i/=2){
+    sum+=__shfl_down_sync(0xffffffff,sum,i);
+    }
+*/
+
 
 #pragma unroll
 __device__ float WarpReduceSumV2(float sum, unsigned int SumSize)

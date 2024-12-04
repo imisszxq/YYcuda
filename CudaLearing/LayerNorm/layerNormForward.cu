@@ -23,6 +23,7 @@ __global__ void layerNorm_kernel_v0(float *__restrict__ output,
     float sum = 0;
     float sum_x2 = 0;
     const float *in = input + idx * n;
+    
     for (int i = tid; i < n; i += blockDim.x)
     {
         sum += in[i];

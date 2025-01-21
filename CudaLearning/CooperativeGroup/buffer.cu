@@ -5,7 +5,6 @@
 
 namespace cg=cooperative_groups;
 
-
 __device__ int calculate_buffer_space_needed(cg::thread_block_tile<32>& tile) {
     return tile.thread_rank() % 2 + 1;
 }
